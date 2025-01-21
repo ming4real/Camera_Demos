@@ -1,0 +1,1 @@
+This has taken the code from https://data-flair.training/blogs/abandoned-object-detection/ and modified it slightly to run in real-time from an attached video camera.
