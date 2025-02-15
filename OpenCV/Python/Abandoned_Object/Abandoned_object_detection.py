@@ -4,6 +4,7 @@
 import numpy as np
 import cv2
 from tracker import *
+import time
 
 # Initialize Tracker
 tracker = ObjectTracker()
@@ -23,8 +24,8 @@ tracker = ObjectTracker()
 # set Width and Height of output Screen 
 # frameWidth = 1920
 # frameHeight = 1080
-frameWidth = 640
-frameHeight = 480
+frameWidth = 1280
+frameHeight = 720
 
 # Use the first available camera
 camera_id = 0
@@ -33,9 +34,12 @@ cap.set(3, frameWidth)
 cap.set(4, frameHeight) 
 
 got_first_frame = False
+frame_count = 0
 
+time_last = time.time()
 while (cap.isOpened()):
     ret, frame = cap.read()
+    frame_count += 1
     
     frame_height, frame_width, _ = frame.shape
 
@@ -43,10 +47,20 @@ while (cap.isOpened()):
     frame_blur = cv2.GaussianBlur(frame_gray,(3,3),0)
 
     if not got_first_frame:
+        if frame_count < 10:
+            # Give the camera a chance to settle
+            continue
         firstframe_gray = frame_gray
         firstframe_blur = frame_blur
         got_first_frame = True
         continue
+
+        if frame_count % 250 == 0:
+            time_now = time.time()
+            time_diff = time_now - time_last
+            fps = 250 / time_diff
+            time_last = time_now
+            print(f"FPS: {fps}")
 
     # find diffrence between first frame and current frame
     frame_diff = cv2.absdiff(firstframe_blur, frame_blur)
